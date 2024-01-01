@@ -156,7 +156,7 @@ function RouterHandleHashChange(routingTable) {
     document.querySelector("#router-body").replaceChildren(routingTable[currentRoute])
 }
 
-function Router(...routes) {
+function Router() {
   let Router = {}
 
   Router.GetCurrentRoute = () => {
