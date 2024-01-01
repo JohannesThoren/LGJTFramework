@@ -145,28 +145,42 @@ function Route(path, body, ...subRoutes) {
 
 function RouterHandleHashChange(routingTable) {
   let currentRoute = window.location.hash.split("#")[1] == undefined ? "/" : window.location.hash.split("#")[1]
-  
+
+  if (routingTable[currentRoute] == undefined) {
+    window.location.href = "#/404"
+    RouterHandleHashChange(routingTable)
+    return
+  }
+
   if (currentRoute.startsWith("/"))
     document.querySelector("#router-body").replaceChildren(routingTable[currentRoute])
 }
 
 function Router(...routes) {
+  let Router = {}
 
-  let routingTable = {}
+  Router.GetCurrentRoute = () => {
+    return window.location.hash.split("#")[1] == undefined ? "/" : window.location.hash.split("#")[1]
+  }
 
-  routes.forEach(r => {
-    routingTable[r.path] = r.body
-    if (r.subRoutes.length == 0)
-      return;
+  Router.routingTable = {}
 
-    r.subRoutes.forEach(sr => {
-      routingTable[r.path + sr.path] = sr.body
+  Router.AddRoutes = (...routes) => {
+    routes.forEach(r => {
+      router.routingTable[r.path] = r.body
+      if (r.subRoutes.length == 0)
+        return;
+
+      r.subRoutes.forEach(sr => {
+        router.routingTable[r.path + sr.path] = sr.body
+      })
     })
-  })
+  }
 
-  window.addEventListener("hashchange", (evt) => RouterHandleHashChange(routingTable))
 
-  return routingTable
+  window.addEventListener("hashchange", (evt) => RouterHandleHashChange(Router.routingTable))
+
+  return Router
 }
 
 function RotuerBody() {
@@ -174,9 +188,19 @@ function RotuerBody() {
 }
 
 function RouterOnLoad(router) {
+  // error routes
+  router.AddRoutes(
+    Route("/404",
+      Div(
+        H("ERROR: 404"),
+        P("The page you are trying to reach does not exist. If you think that this is incorrect, Pleas contact the page adminsrator.")
+      )
+    )
+  )
+
   window.addEventListener('load', () => {
     document.querySelector("body").appendChild(RotuerBody());
-    RouterHandleHashChange(router)
+    RouterHandleHashChange(router.routingTable)
     console.log(router)
   })
 }
