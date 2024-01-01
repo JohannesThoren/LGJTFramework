@@ -193,7 +193,7 @@ function RouterOnLoad(router) {
     Route("/404",
       Div(
         H("ERROR: 404"),
-        P("The page you are trying to reach does not exist. If you think that this is incorrect, Pleas contact the page adminsrator.")
+        P("The page you are trying to reach does not exist. If you think that this is incorrect, Please contact the page adminstrator.")
       )
     )
   )
