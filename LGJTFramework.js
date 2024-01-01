@@ -131,20 +131,40 @@ function TabRoot(...tabs) {
  * @returns 
  */
 
-function RouterLink(text, route) {
-  return A(text, "#" + route)
+function RouterLink(text, route, router) {
+  let link = A(text, "#" + route)
+  return link
 }
 
 function Route(path, body, ...subRoutes) {
   return {
     path: path,
     body: body,
-    subRoutes: subRoutes,
+    GetSubRoutes: () => {
+      let list = []
+
+      if (subRoutes.length == 0)
+        return list
+
+      subRoutes.forEach((r) => {
+        r.GetSubRoutes().forEach(sr => {
+          sr.path = r.path + sr.path
+          list.push(sr)
+        })
+
+        list.push(r)
+      })
+
+      return list
+    },
   }
 }
 
 function RouterHandleHashChange(routingTable) {
+
+
   let currentRoute = window.location.hash.split("#")[1] == undefined ? "/" : window.location.hash.split("#")[1]
+
 
   if (routingTable[currentRoute] == undefined) {
     window.location.href = "#/404"
@@ -159,20 +179,16 @@ function RouterHandleHashChange(routingTable) {
 function Router() {
   let Router = {}
 
-  Router.GetCurrentRoute = () => {
-    return window.location.hash.split("#")[1] == undefined ? "/" : window.location.hash.split("#")[1]
-  }
-
   Router.routingTable = {}
 
   Router.AddRoutes = (...routes) => {
     routes.forEach(r => {
       router.routingTable[r.path] = r.body
-      if (r.subRoutes.length == 0)
-        return;
 
-      r.subRoutes.forEach(sr => {
-        router.routingTable[r.path + sr.path] = sr.body
+
+      r.GetSubRoutes().forEach(sr => {
+        Router.routingTable[sr.path] = sr.body
+
       })
     })
   }
