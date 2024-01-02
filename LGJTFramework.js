@@ -214,7 +214,7 @@ function RouterOnLoad(router) {
     )
   )
 
-  window.addEventListener('load', () => {
+  document.addEventListener('load', () => {
     document.querySelector("body").appendChild(RotuerBody());
     RouterHandleHashChange(router.routingTable)
     console.log(router)
